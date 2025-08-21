@@ -289,30 +289,54 @@ try:
         # Se não encontrou na linha principal, busca na linha alternativa
         if prolabore_a_recolher is None:
             print("Prolabore não encontrado na linha principal, buscando na linha alternativa...")
-            # Busca pela linha com "Líquido - >" ou "LÃquido - >" nas classes s28
-            results_alt = soup.find_all('td', class_='s28', string=lambda text: text and ("Líquido - >" in text or "LÃquido - >" in text))
             
-            # Se não encontrou, tenta outras variações
+            # Busca por td contendo "Líquido - >" seguido por valor em s28
+            results_alt = soup.find_all('td', class_='s27', string=lambda text: text and "Líquido - >" in text)
             if not results_alt:
-                results_alt = soup.find_all('td', class_='s28', string=lambda text: text and ("Líquido" in text or "LÃquido" in text) and "->" in text)
+                results_alt = soup.find_all('td', class_='s27', string=lambda text: text and "LÃquido - >" in text)
             
             for result in results_alt:
                 row = result.find_parent('tr')
-                # Busca todos os td com class s29 na linha
-                values_s29 = row.find_all('td', class_='s29')
-                if values_s29:
+                # Busca o próximo td com class s28 que deve conter o valor
+                value_s28 = row.find('td', class_='s28')
+                if value_s28:
                     try:
-                        # O primeiro valor s29 deve ser o prolabore alternativo (6.172,30)
-                        prolabore_text = values_s29[0].get_text(strip=True)
+                        prolabore_text = value_s28.get_text(strip=True)
                         # Remove pontos e substitui vírgula por ponto
                         clean_value = prolabore_text.replace('.', '').replace(',', '.')
                         prolabore_a_recolher = float(clean_value)
                         if prolabore_a_recolher > 0:
                             formatted_value = f"{prolabore_a_recolher:,.2f}".replace('.', ',').replace(',', '', 1)
-                            print(f"total_prolabore_a_recolher (alternativo): {formatted_value}")
+                            print(f"total_prolabore_a_recolher (método s27/s28): {formatted_value}")
                             break
                     except (ValueError, IndexError):
                         continue
+            
+            # Se ainda não encontrou, tenta a busca original com s28 e s29
+            if prolabore_a_recolher is None:
+                results_alt = soup.find_all('td', class_='s28', string=lambda text: text and ("Líquido - >" in text or "LÃquido - >" in text))
+                
+                # Se não encontrou, tenta outras variações
+                if not results_alt:
+                    results_alt = soup.find_all('td', class_='s28', string=lambda text: text and ("Líquido" in text or "LÃquido" in text) and "->" in text)
+                
+                for result in results_alt:
+                    row = result.find_parent('tr')
+                    # Busca todos os td com class s29 na linha
+                    values_s29 = row.find_all('td', class_='s29')
+                    if values_s29:
+                        try:
+                            # O primeiro valor s29 deve ser o prolabore alternativo
+                            prolabore_text = values_s29[0].get_text(strip=True)
+                            # Remove pontos e substitui vírgula por ponto
+                            clean_value = prolabore_text.replace('.', '').replace(',', '.')
+                            prolabore_a_recolher = float(clean_value)
+                            if prolabore_a_recolher > 0:
+                                formatted_value = f"{prolabore_a_recolher:,.2f}".replace('.', ',').replace(',', '', 1)
+                                print(f"total_prolabore_a_recolher (método s28/s29): {formatted_value}")
+                                break
+                        except (ValueError, IndexError):
+                            continue
                         
         if prolabore_a_recolher is None:
             print("total_prolabore_a_recolher: Valor não encontrado no HTML")
