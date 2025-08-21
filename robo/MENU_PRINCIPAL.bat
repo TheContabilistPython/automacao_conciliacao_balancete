@@ -1,6 +1,9 @@
 @echo off
+
+:inicio
 title EXECUTAR TODOS OS SCRIPTS - Menu Principal
 color 0A
+cls
 echo ==============================================
 echo    MENU PRINCIPAL - SCRIPTS DE CONCILIACAO
 echo ==============================================
@@ -95,7 +98,3 @@ if /i "%continuar%"=="N" goto sair
 echo Opcao invalida! Saindo...
 pause
 exit /b 0
-
-:inicio
-cls
-goto inicio
