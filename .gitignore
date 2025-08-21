@@ -1,0 +1,76 @@
+# Arquivos Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Ambientes virtuais
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Arquivos temporários do Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Arquivos de log
+*.log
+
+# Arquivos de dados sensíveis
+*.csv
+*.xlsx
+*.xls
+
+# Relatórios HTML (podem ser grandes e temporários)
+*.htm
+*.html
+
+# Backups
+*.bak
+*.backup
+*.old
+
+# Arquivos compactados
+*.rar
+*.zip
+*.7z
+
+# Capturas de tela
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Atalhos do Windows
+*.lnk
+
+# Diretórios específicos que podem conter dados temporários
+bckup*/
+OLD/
+old/
+temp/
+tmp/
