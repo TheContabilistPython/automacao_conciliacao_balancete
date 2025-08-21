@@ -666,6 +666,22 @@ for row in ws.iter_rows(min_row=2):
                         else:
                             ws.cell(row=row[0].row, column=9, value="Verificar")
                             print(f"Linha {row[0].row}: Escreveu Verificar (diferença G: {abs(valor_coluna_g_float - valor) if valor_coluna_g_float is not None and valor is not None else 'N/A'})")
+                    elif cell_a == 169:
+                        # Para o caso 169 (prolabore_a_recolher), verifica coluna G OU coluna H
+                        condicao_g = valor_coluna_g_float is not None and valor is not None and abs(valor_coluna_g_float - valor) <= tolerancia
+                        condicao_h = valor_coluna_h_float is not None and valor is not None and abs(valor_coluna_h_float - valor) <= tolerancia
+                        
+                        ws.cell(row=row[0].row, column=10, value=f"PROLABORE: G={valor_coluna_g_float} e H={valor_coluna_h_float} vs {valor_nome}={valor}")
+                        if condicao_g or condicao_h:  # Se qualquer uma das condições for verdadeira
+                            ws.cell(row=row[0].row, column=9, value="OK")
+                            coluna_ok = "G" if condicao_g else "H"
+                            diferenca_ok = abs(valor_coluna_g_float - valor) if condicao_g else abs(valor_coluna_h_float - valor)
+                            print(f"Linha {row[0].row}: Escreveu OK (coluna {coluna_ok} bateu, diferença: {diferenca_ok})")
+                        else:
+                            ws.cell(row=row[0].row, column=9, value="Verificar")
+                            diferenca_g = abs(valor_coluna_g_float - valor) if valor_coluna_g_float is not None and valor is not None else 'N/A'
+                            diferenca_h = abs(valor_coluna_h_float - valor) if valor_coluna_h_float is not None and valor is not None else 'N/A'
+                            print(f"Linha {row[0].row}: Escreveu Verificar (diferença G: {diferenca_g}, diferença H: {diferenca_h})")
                     else:
                         # Para todos os outros casos, aplica a tolerância de 10 centavos
                         valor_comparacao = valor_coluna_h_float

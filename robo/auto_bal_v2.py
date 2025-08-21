@@ -257,12 +257,6 @@ def colar_balancete_no_excel(competencia, nome_empresa):
     from openpyxl import load_workbook
     from openpyxl.utils.dataframe import dataframe_to_rows
 
-    # Gera nome de arquivo seguro
-def colar_balancete_no_excel(competencia, nome_empresa):
-    import pandas as pd
-    from openpyxl import load_workbook
-    from openpyxl.utils.dataframe import dataframe_to_rows
-
     nome_empresa_arquivo = nome_empresa.replace(' ', '_').replace('/', '_').replace('\\', '_')
     caminho_csv = f'C:\\projeto\\planilhas\\balancete\\balancete_{competencia}_{nome_empresa_arquivo}.csv'
     caminho_modelo = r'C:\projeto\planilhas\CONCILIACAO_EMPRESA_XX_XXXX.xlsx'
@@ -283,10 +277,33 @@ def colar_balancete_no_excel(competencia, nome_empresa):
         print(f"Erro ao abrir o modelo Excel: {e}")
         return
 
+    # Inserir os dados começando na coluna A
+    start_column = 1  # Coluna A
+    start_row = 1
+    
     # Agora df está definido e pode ser usado aqui
-    for r_idx, row in enumerate(dataframe_to_rows(df, index=False, header=True), 1):
-        for c_idx, value in enumerate(row, 1):  # 2 = coluna B
-            ws.cell(row=r_idx, column=c_idx, value=value)
+    for r_idx, row in enumerate(dataframe_to_rows(df, index=False, header=True), start_row):
+        for c_idx, value in enumerate(row, start_column):
+            try:
+                cell = ws.cell(row=r_idx, column=c_idx)
+                # Verifica se a célula não é None e se pode receber valor
+                if cell is not None:
+                    # Tenta escrever o valor, lidando com células mescladas
+                    try:
+                        # Para células mescladas, tenta acessar a célula principal do merge
+                        if hasattr(cell, 'value'):
+                            cell.value = value
+                        else:
+                            # Se não conseguir acessar, pula
+                            print(f"Pulando célula sem acesso na linha {r_idx}, coluna {c_idx}")
+                            continue
+                    except (AttributeError, ValueError) as e:
+                        # Se der erro, pode ser célula mesclada ou protegida
+                        print(f"Pulando célula com restrição na linha {r_idx}, coluna {c_idx}: {e}")
+                        continue
+            except Exception as e:
+                print(f"Erro ao escrever na célula ({r_idx}, {c_idx}): {e}")
+                continue
 
     try:
         wb.save(caminho_saida)
@@ -299,8 +316,6 @@ if nome_empresa:
     colar_balancete_no_excel(competencia, nome_empresa)
 else:
     print("Nome da empresa não encontrado.")
-
-colar_balancete_no_excel(competencia, nome_empresa)
 
 # # # Função para processar o balancete baixado
 # # def processar_balancete(caminho_balancete, codigo_empresa, mes, ano):
